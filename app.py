@@ -29,7 +29,7 @@ app.layout = html.Div(children=[
     html.Div([
         dcc.Graph(figure=sepal_fig),
         dcc.Graph(figure=petal_fig)
-    ])
+    ], style={'display': 'flex'})
 ])
 
 if __name__ == '__main__':
