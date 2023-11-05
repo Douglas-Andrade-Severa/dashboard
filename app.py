@@ -1,5 +1,6 @@
 import dash 
 from dash import dcc, html
+from dash import Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -27,13 +28,6 @@ import yfinance as yf
 data = pd.read_csv('b3.csv', index_col=0)
 
 #Contrução do gráfico
-data1 = data.iloc[:, :-1]
-fig1  = px.line(data1)
-fig1.update_layout(title='B3 10+',
-                   yaxis_title='Preço (R$)',
-                   xaxis_title='Data',
-                   template='plotly_dark') #plotly.com/python/templates
-
 
 data2 = data['VALE3.SA']
 fig2  = px.line(data2)
@@ -81,9 +75,13 @@ app.layout = dbc.Container([#dash-bootstrap-components.opensource.faculty.ia/doc
 
     dbc.Row([
         dbc.Col([
-            dcc.Graph(figure=fig1)
+            dcc.Dropdown(id='menu', value=['ABEV3.SA'],
+                        options={x:x for x in data.columns},
+                        multi=True),
+            dcc.Graph(id='grafico')
         ])
     ]),
+
     dbc.Row([
         dbc.Col([
             dcc.Graph(figure=fig2)
@@ -98,6 +96,23 @@ app.layout = dbc.Container([#dash-bootstrap-components.opensource.faculty.ia/doc
         ])
     ])
 ])
+
+
+# Callbacks
+@app.callback(
+    Output('grafico','figure'),
+    Input('menu', 'value')
+)
+def funcao(acoes):
+    data_fig = data[acoes]
+    fig  = px.line(data_fig)
+    fig.update_layout(title='B3 10+',
+                    yaxis_title='Preço (R$)',
+                    xaxis_title='Data',
+                    template='plotly_dark',
+                    showlegend=False) #plotly.com/python/templates
+    return fig
+    
 
 #Execução da aplicação
 if __name__ == '__main__':
